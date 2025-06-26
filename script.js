@@ -15,11 +15,11 @@ const config = {
 const game = new Phaser.Game(config);
 let pokeball
 let ball;
-let ballSize = 80;
-let lives = 10;
+let ballSize = 90;
+let lives = 20;
 let livestext;
 let gameovertext;
-let ballXSpeed = 1.0;
+let ballXSpeed = 2.0;
 let ballYSpeed = 0.5;
 let pokeballXSpeed = -1.0;
 let pokeballYSpeed = -0.5;
