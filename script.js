@@ -42,6 +42,7 @@ function create() {
     pokeball = this.add.sprite(WIDTH / 2, HEIGHT / 2, "pokeball");
     pokeball.setDisplaySize(ballSize, ballSize);
 
+
     // Make the ball interactive
     ball.setInteractive();
     pokeball.setInteractive();
