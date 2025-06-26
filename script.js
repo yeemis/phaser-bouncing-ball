@@ -16,11 +16,13 @@ const game = new Phaser.Game(config);
 let pokeball
 let ball;
 let ballSize = 80;
-let yspeed = 0.5;
-let xspeed = 1.0;
 let lives = 10;
 let livestext;
 let gameovertext;
+let ballXSpeed = 1.0;
+let ballYSpeed = 0.5;
+let pokeballXSpeed = -1.0;
+let pokeballYSpeed = -0.5;
 
 
 function preload() {
@@ -51,8 +53,8 @@ function create() {
         ball.setDisplaySize(ballSize, ballSize);
 
         // Increase speed by 10%
-        xspeed *= 1.1;
-        yspeed *= 1.1;
+        ballXSpeed *= 1.1;
+        ballYSpeed *= 1.1;
         lives+= 1;
         livestext.setText(`Lives: ${lives}`);
     });
@@ -62,8 +64,8 @@ function create() {
         pokeball.setDisplaySize(ballSize, ballSize);
 
         // Increase speed by 10%
-        xspeed *= 1.1;
-        yspeed *= 1.1;
+        pokeballXSpeed *= 1.1;
+        pokeballYSpeed *= 1.1;
         lives+= 1;
         livestext.setText(`Lives: ${lives}`);
     });
@@ -78,22 +80,31 @@ function update() {
     if (lives <= 0) {
         return; // Stop the game if lives are zero
     }
-    ball.y += yspeed;
-    ball.x += xspeed;
-    pokeball.y += yspeed * 3; // Pokeball moves faster than the ball
-    pokeball.x += xspeed;
+    ball.x += ballXSpeed;
+    ball.y += ballYSpeed;
+    pokeball.x += pokeballXSpeed;
+    pokeball.y += pokeballYSpeed;
 
     // Collision detection between ball and pokeball
     const dx = ball.x - pokeball.x;
     const dy = ball.y - pokeball.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance < ballSize) {
-        // Simple bounce: reverse directions
-        xspeed *= -1.1;
-        yspeed *= -1.5;
+        // Calculate the angle of collision
+        const angle = Math.atan2(dy, dx);
+
+        // Get speeds in the direction of the collision
+        const speed1 = Math.cos(angle) * ballXSpeed + Math.sin(angle) * ballYSpeed;
+        const speed2 = Math.cos(angle) * pokeballXSpeed + Math.sin(angle) * pokeballYSpeed;
+
+        // Swap the speeds
+        ballXSpeed += Math.cos(angle) * (speed2 - speed1);
+        ballYSpeed += Math.sin(angle) * (speed2 - speed1);
+        pokeballXSpeed += Math.cos(angle) * (speed1 - speed2);
+        pokeballYSpeed += Math.sin(angle) * (speed1 - speed2);
+
         // Move them apart so they don't stick
         const overlap = ballSize - distance;
-        const angle = Math.atan2(dy, dx);
         ball.x += Math.cos(angle) * (overlap / 2);
         ball.y += Math.sin(angle) * (overlap / 2);
         pokeball.x -= Math.cos(angle) * (overlap / 2);
@@ -102,25 +113,25 @@ function update() {
 
     // The || sign means "or"
     if (ball.y >= HEIGHT - ballSize / 2 || ball.y <= ballSize / 2) {
-        yspeed *= -1;
+        ballYSpeed *= -1;
         lives -= 1;
         livestext.setText(`Lives: ${lives}`);
         checkGameOver();
     }
     if (ball.x >= WIDTH - ballSize / 2 || ball.x <= ballSize / 2) {
-        xspeed *= -1;
+        ballXSpeed *= -1;
         lives -= 1;
         livestext.setText(`Lives: ${lives}`);
         checkGameOver();
     }
     if (pokeball.y >= HEIGHT - ballSize / 2 || pokeball.y <= ballSize / 2) {
-        yspeed *= -1;
+        pokeballYSpeed *= -1;
         lives -= 1;
         livestext.setText(`Lives: ${lives}`);
         checkGameOver();
     }
     if (pokeball.x >= WIDTH - ballSize / 2 || pokeball.x <= ballSize / 2) {
-        xspeed *= -1;
+        pokeballXSpeed *= -1;
         lives -= 1;
         livestext.setText(`Lives: ${lives}`);
         checkGameOver();
